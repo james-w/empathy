@@ -455,7 +455,7 @@ contact_list_view_key_press_event_cb (EmpathyContactListView *view,
 		g_idle_add (contact_list_view_popup_menu_idle_cb, data);
 	}
 
-	retunr FALSE;
+	return FALSE;
 }
 
 static void
