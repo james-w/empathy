@@ -6,6 +6,7 @@ AM_CPPFLAGS =						\
 	-DG_LOG_DOMAIN=\"empathy\"			\
 	$(EMPATHY_CFLAGS)				\
 	$(LIBNOTIFY_CFLAGS)				\
+	$(INDICATE_CFLAGS)				\
 	$(LIBCHAMPLAIN_CFLAGS)				\
 	$(DISABLE_DEPRECATED)				\
 	$(WEBKIT_CFLAGS)				\
@@ -16,6 +17,7 @@ LDADD =								\
 	$(top_builddir)/libempathy/libempathy.la		\
 	$(top_builddir)/extensions/libemp-extensions.la		\
 	$(LIBNOTIFY_LIBS)					\
+	$(INDICATE_LIBS)					\
 	$(EMPATHY_LIBS)						\
 	$(LIBCHAMPLAIN_LIBS)					\
 	$(WEBKIT_LIBS)
@@ -78,9 +80,21 @@ ui_DATA = 					\
 	empathy-preferences.ui			\
 	empathy-status-icon.ui
 
-EXTRA_DIST =			\
-	$(autostart_DATA)	\
+EXTRA_DIST =					\
+	$(autostart_DATA)			\
 	$(ui_DATA)
+
+if HAVE_LIBINDICATE
+empathy_SOURCES += 				\
+	empathy-indicator-manager.c		\
+	empathy-indicator-manager.h 		\
+	empathy-indicator.c empathy-indicator.h
+else
+EXTRA_DIST += 					\
+	empathy-indicator-manager.c		\
+	empathy-indicator-manager.h		\
+	empathy-indicator.c empathy-indicator.h
+endif
 
 if HAVE_LIBCHAMPLAIN
 empathy_handwritten_source += 				\

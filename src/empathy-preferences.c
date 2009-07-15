@@ -52,6 +52,7 @@ typedef struct {
 
 	GtkWidget *checkbutton_show_smileys;
 	GtkWidget *checkbutton_show_contacts_in_rooms;
+	GtkWidget *checkbutton_use_libindicate;
 	GtkWidget *combobox_chat_theme;
 	GtkWidget *checkbutton_separate_chat_windows;
 	GtkWidget *checkbutton_autoconnect;
@@ -209,6 +210,22 @@ preferences_setup_widgets (EmpathyPreferences *preferences)
 	preferences_hookup_toggle_button (preferences,
 					  EMPATHY_PREFS_UI_SEPARATE_CHAT_WINDOWS,
 					  preferences->checkbutton_separate_chat_windows);
+
+	preferences_hookup_toggle_button (preferences,
+					  EMPATHY_PREFS_UI_SHOW_AVATARS,
+					  preferences->checkbutton_show_avatars);
+
+#ifdef HAVE_LIBINDICATE
+	preferences_hookup_toggle_button (preferences,
+					  EMPATHY_PREFS_UI_USE_LIBINDICATE,
+					  preferences->checkbutton_use_libindicate);
+#else
+	gtk_widget_hide(GTK_WIDGET(preferences->checkbutton_use_libindicate));
+#endif
+
+	preferences_hookup_toggle_button (preferences,
+					  EMPATHY_PREFS_UI_COMPACT_CONTACT_LIST,
+					  preferences->checkbutton_compact_contact_list);
 
 	preferences_hookup_toggle_button (preferences,
 					  EMPATHY_PREFS_CHAT_SHOW_SMILEYS,
@@ -1136,6 +1153,7 @@ empathy_preferences_show (GtkWindow *parent)
 		"notebook", &preferences->notebook,
 		"checkbutton_show_smileys", &preferences->checkbutton_show_smileys,
 		"checkbutton_show_contacts_in_rooms", &preferences->checkbutton_show_contacts_in_rooms,
+		"checkbutton_use_libindicate", &preferences->checkbutton_use_libindicate,
 		"combobox_chat_theme", &preferences->combobox_chat_theme,
 		"checkbutton_separate_chat_windows", &preferences->checkbutton_separate_chat_windows,
 		"checkbutton_autoconnect", &preferences->checkbutton_autoconnect,
