@@ -85,7 +85,7 @@ EXTRA_DIST =					\
 	$(ui_DATA)
 
 if HAVE_LIBINDICATE
-empathy_SOURCES += 				\
+empathy_handwritten_source += 				\
 	empathy-indicator-manager.c		\
 	empathy-indicator-manager.h 		\
 	empathy-indicator.c empathy-indicator.h

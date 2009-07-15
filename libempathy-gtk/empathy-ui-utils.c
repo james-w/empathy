@@ -1271,6 +1271,8 @@ empathy_window_iconify (GtkWindow *window, GtkStatusIcon *status_icon)
 	Display      *dpy;
 	GdkWindow    *gdk_window;
 
+	// If the status icon isn't visible (because indicators are used) then
+	// attempting to change the properties of the status icon doesn't work.
 	if (gtk_status_icon_get_visible (status_icon)) {
 		gtk_status_icon_get_geometry (status_icon, NULL, &icon_location, NULL);
 		gdk_window = GTK_WIDGET (window)->window;
@@ -1290,6 +1292,9 @@ empathy_window_iconify (GtkWindow *window, GtkStatusIcon *status_icon)
 	}
 
 	gtk_window_set_skip_taskbar_hint (window, TRUE);
+	// If the status icon isn't present then the WM will probably choose to
+	// iconfy to the taskbar, which doesn't look as good as the taskbar
+	// entry has just been removed. Just hide instead.
 	if (gtk_status_icon_get_visible (status_icon)) {
 		gtk_window_iconify (window);
 	} else {

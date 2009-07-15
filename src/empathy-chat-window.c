@@ -80,6 +80,7 @@ typedef struct {
 	NotifyNotification *notification;
 #ifdef HAVE_LIBINDICATE
 	EmpathyIndicatorManager *indicator_manager;
+	/* EmpathyChat -> EmpathyIndicator for that chat, if any */
 	GHashTable  *indicators;
 #endif
 
@@ -953,7 +954,6 @@ chat_window_indicator_activate_cb (EmpathyIndicator *indicator,
 	empathy_chat_window_present_chat (cb_data->chat);
 
 	empathy_indicator_hide (indicator);
-	g_object_unref (indicator);
 	g_object_unref (cb_data->chat);
 	g_slice_free (NotificationData, cb_data);
 }
@@ -989,11 +989,11 @@ chat_window_add_indicator (EmpathyChatWindow *window,
 	if (indicator) {
 		empathy_indicator_update (indicator, body);
 	} else {
-		indicator = empathy_indicator_manager_add_indicator (priv->indicator_manager,
+		indicator = empathy_indicator_manager_create_indicator (priv->indicator_manager,
 			sender, body);
 		g_signal_connect (indicator, "activate",
 				  G_CALLBACK (chat_window_indicator_activate_cb), cb_data);
-		g_hash_table_insert(priv->indicators, chat, g_object_ref(indicator));
+		g_hash_table_insert(priv->indicators, chat, indicator);
 	}
 	empathy_indicator_show (indicator);
 }
@@ -1450,8 +1450,6 @@ chat_window_finalize (GObject *object)
 	window = EMPATHY_CHAT_WINDOW (object);
 	priv = GET_PRIV (window);
 
-	DEBUG ("Finalized: %p", object);
-
 	g_object_unref (priv->ui_manager);
 	g_object_unref (priv->chatroom_manager);
 	if (priv->save_geometry_id != 0) {
@@ -1551,7 +1549,8 @@ empathy_chat_window_init (EmpathyChatWindow *window)
 	priv->chatroom_manager = empathy_chatroom_manager_dup_singleton (NULL);
 #ifdef HAVE_LIBINDICATE
 	priv->indicator_manager = empathy_indicator_manager_dup_singleton ();
-	priv->indicators = g_hash_table_new (NULL, NULL);
+	priv->indicators = g_hash_table_new_full (g_direct_hash, g_direct_equal,
+			      NULL, g_object_unref);
 #endif
 
 	priv->notebook = gtk_notebook_new ();

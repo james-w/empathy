@@ -1,5 +1,28 @@
-#ifndef EMPATHY_INDICATOR_MANAGER_H
-#define EMPATHY_INDICATOR_MANAGER_H
+/* -*- Mode: C; tab-width: 8; indent-tabs-mode: t; c-basic-offset: 8 -*- */
+/*
+ * Copyright (C) 2009 Canonical Ltd.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program; if not, write to the
+ * Free Software Foundation, Inc., 51 Franklin St, Fifth Floor,
+ * Boston, MA  02110-1301  USA
+ *
+ * Authors: James Westby <james.westby@ubuntu.com>
+ *
+ */
+
+#ifndef _EMPATHY_INDICATOR_MANAGER_H_
+#define _EMPATHY_INDICATOR_MANAGER_H_
 
 #include <glib.h>
 
@@ -19,26 +42,26 @@ typedef struct _EmpathyIndicatorManager      EmpathyIndicatorManager;
 typedef struct _EmpathyIndicatorManagerClass EmpathyIndicatorManagerClass;
 
 struct _EmpathyIndicatorManager {
-	GObject parent;
-	gpointer priv;
+  GObject parent;
+  gpointer priv;
 };
 
 struct _EmpathyIndicatorManagerClass {
-	GObjectClass parent_class;
+  GObjectClass parent_class;
 };
 
 GType              empathy_indicator_manager_get_type (void) G_GNUC_CONST;
 EmpathyIndicatorManager *empathy_indicator_manager_dup_singleton (void);
 void               empathy_indicator_manager_set_server_visible (EmpathyIndicatorManager *manager,
-                        gboolean visible);
-EmpathyIndicator * empathy_indicator_manager_add_indicator (
-                        EmpathyIndicatorManager *manager,
-                        EmpathyContact          *sender,
-                        const gchar             *body);
+    gboolean visible);
+EmpathyIndicator * empathy_indicator_manager_create_indicator (
+    EmpathyIndicatorManager *manager,
+    EmpathyContact          *sender,
+    const gchar             *body);
 void               empathy_indicator_manager_add_login_indicator (
-                        EmpathyIndicatorManager *manager,
-                        EmpathyContact          *contact);
+    EmpathyIndicatorManager *manager,
+    EmpathyContact          *contact);
 
 G_END_DECLS
 
-#endif /* EMPATHY_INDICATOR_MANAGER_H */
+#endif /* _EMPATHY_INDICATOR_MANAGER_H_ */

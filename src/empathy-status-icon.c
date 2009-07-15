@@ -79,10 +79,6 @@ typedef struct {
 
 G_DEFINE_TYPE (EmpathyStatusIcon, empathy_status_icon, G_TYPE_OBJECT);
 
-#ifdef HAVE_LIBINDICATE
-static void indicate_server_activate_cb (EmpathyIndicatorManager *, EmpathyStatusIcon   *);
-#endif
-
 static gboolean
 activate_event (EmpathyEvent *event)
 {
@@ -91,6 +87,10 @@ activate_event (EmpathyEvent *event)
 	return FALSE;
 }
 
+/* Query whether the notification server supports the "action"
+ * extension to the notifications specification, if it doesn't
+ * the sending actions has undefined results.
+ */
 static gboolean
 notification_server_supports_actions (void)
 {
@@ -103,7 +103,7 @@ notification_server_supports_actions (void)
 		if (!cap) {
 			continue;
 		}
-		if (!strcmp(cap, "actions")) {
+		if (!tp_strdiff(cap, "actions")) {
 			ret = TRUE;
 			break;
 		}
@@ -143,6 +143,11 @@ status_icon_notification_closed_cb (NotifyNotification *notification,
 		 */
 		g_idle_add ((GSourceFunc) activate_event, priv->event);
 	} else {
+		/* inhibit other updates for this event, but only if
+		 * the server supports actions, using that as a proxy
+		 * for being click-through, as many notifications aren't
+		 * a problem then. Maybe not the right thing to do.
+		 */
 		if (notification_server_supports_actions ()) {
 			empathy_event_inhibit_updates (priv->event);
 		}
@@ -372,6 +377,9 @@ status_icon_set_use_libindicate (EmpathyStatusIcon *icon,
 	if (use_libindicate) {
 		empathy_indicator_manager_set_server_visible (priv->indicator_manager,
 				TRUE);
+		/* Hide the status icon so there are not two ways to access empathy.
+		 * Should use libindicate's "interest" to confirm someone is listening.
+		 */
 		gtk_status_icon_set_visible(priv->icon, FALSE);
 	} else {
 		empathy_indicator_manager_set_server_visible (priv->indicator_manager,
@@ -424,6 +432,11 @@ status_icon_toggle_visibility (EmpathyStatusIcon *icon)
 			       EMPATHY_PREFS_UI_USE_LIBINDICATE,
 		               &use_libindicate);
 	if (use_libindicate) {
+		/* If indicators are used then we may very well not be active
+		 * when toggled, as they are usually windows themselves. This
+		 * makes it damn hard to toggle, so we just look at whether
+		 * we are visible.
+		 */
 		visible = GTK_WIDGET_VISIBLE (priv->window);
 	}
 #endif
@@ -619,6 +632,10 @@ status_icon_finalize (GObject *object)
 	g_object_unref (priv->account_manager);
 	g_object_unref (priv->event_manager);
 	g_object_unref (priv->ui_manager);
+
+#ifdef HAVE_LIBINDICATE
+	g_object_unref (priv->indicator_manager);
+#endif
 }
 
 static void

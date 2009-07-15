@@ -299,7 +299,7 @@
       <locale name="C">
          <short>Use the messaging indicator</short>
          <long>
-         Whether or not to use the messaging indicator, if false 
+         Whether or not to use the messaging indicator, if false
 	 the icon in the notification area will be displayed.
          </long>
       </locale>

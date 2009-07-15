@@ -67,10 +67,6 @@
 #include "empathy-indicator-manager.h"
 #endif
 
-#ifdef HAVE_LIBINDICATE
-#include "empathy-indicator-manager.h"
-#endif
-
 #define DEBUG_FLAG EMPATHY_DEBUG_OTHER
 #include <libempathy/empathy-debug.h>
 
@@ -124,7 +120,7 @@ typedef struct {
 	GList                  *actions_connected;
 #ifdef HAVE_LIBINDICATE
 	EmpathyIndicatorManager *indicator_manager;
-      	GHashTable              *indicator_timeouts;
+	GHashTable              *indicator_timeouts;
 #endif
 } EmpathyMainWindow;
 
@@ -683,6 +679,10 @@ main_window_destroy_cb (GtkWidget         *widget,
 			  		      window);
 	g_object_unref (window->event_manager);
 	g_object_unref (window->ui_manager);
+
+#ifdef HAVE_LIBINDICATE
+	g_object_unref (window->indicator_manager);
+#endif
 
 	g_free (window);
 }
